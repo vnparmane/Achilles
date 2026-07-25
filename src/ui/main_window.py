@@ -25,6 +25,7 @@ NAV_ITEMS = [
     ("", None, None),
     ("REPORTS", None, None),
     ("Stock Report", "stock_report", None),
+    ("Stock Movement", "stock_movement", None),
     ("Party Ledger", "ledger", None),
     ("GST Report", "gst_report", None),
     ("Purchase Register", "purchase_register", None),
@@ -172,6 +173,7 @@ class MainWindow(QMainWindow):
         from src.ui.transactions.payment import PaymentEntryWidget
         from src.ui.transactions.stock_adjustment import StockAdjustmentWidget
         from src.ui.reports.stock_report import StockReportWidget
+        from src.ui.reports.movement_report import StockMovementReportWidget
         from src.ui.reports.ledger_report import LedgerReportWidget
         from src.ui.reports.gst_report import GSTReportWidget
         from src.ui.reports.register_report import RegisterReportWidget
@@ -187,6 +189,7 @@ class MainWindow(QMainWindow):
             "payment": lambda sf: PaymentEntryWidget(sf, self.current_user),
             "stock_adjustment": lambda sf: StockAdjustmentWidget(sf, self.current_user),
             "stock_report": StockReportWidget,
+            "stock_movement": StockMovementReportWidget,
             "ledger": LedgerReportWidget,
             "gst_report": GSTReportWidget,
             "purchase_register": RegisterReportWidget,
