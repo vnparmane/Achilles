@@ -19,3 +19,13 @@ class GodownService:
 
     def get_godown_by_id(self, godown_id: int) -> Godown | None:
         return self.session.get(Godown, godown_id)
+
+    def update_godown(self, godown_id: int, **kwargs) -> Godown | None:
+        godown = self.session.get(Godown, godown_id)
+        if godown is None:
+            return None
+        for key, value in kwargs.items():
+            if hasattr(godown, key):
+                setattr(godown, key, value)
+        self.session.commit()
+        return godown

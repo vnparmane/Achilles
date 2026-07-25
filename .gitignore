@@ -152,7 +152,6 @@ settings.local.py
 .agent/
 .agent-cache/
 
-# Keep shared agent instructions
 
 AGENTS.md
 
