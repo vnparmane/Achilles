@@ -49,6 +49,9 @@ class PaymentService:
             ).all()
         )
 
+    def get_payment_by_id(self, payment_id: int) -> PaymentTransaction | None:
+        return self.session.get(PaymentTransaction, payment_id)
+
     def get_party_outstanding(self, party_id: int) -> float:
         total_billed = 0.0
         party = self.session.get(Party, party_id)

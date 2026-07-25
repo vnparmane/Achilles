@@ -1,5 +1,7 @@
 import hashlib
 
+import bcrypt
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -7,7 +9,18 @@ from src.database.models.user import User
 
 
 def _hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
+def _check_password(password: str, password_hash: str) -> bool:
+    try:
+        return bcrypt.checkpw(password.encode(), password_hash.encode())
+    except ValueError:
+        return False
+
+
+def _is_sha256_hash(h: str) -> bool:
+    return len(h) == 64 and all(c in "0123456789abcdef" for c in h)
 
 
 class UserService:
@@ -23,9 +36,14 @@ class UserService:
         )
         if user is None:
             return None
-        if user.password_hash != _hash_password(password):
-            return None
-        return user
+        if _check_password(password, user.password_hash):
+            return user
+        if _is_sha256_hash(user.password_hash):
+            if user.password_hash == hashlib.sha256(password.encode()).hexdigest():
+                user.password_hash = _hash_password(password)
+                self.session.commit()
+                return user
+        return None
 
     def create_user(
         self,
