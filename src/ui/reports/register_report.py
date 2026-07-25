@@ -4,8 +4,9 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QLabel,
     QAbstractItemView, QTabWidget, QFileDialog, QMessageBox,
+    QDateEdit,
 )
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QDate
 from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
@@ -39,6 +40,16 @@ class RegisterReportWidget(QWidget):
         layout.addWidget(header)
 
         toolbar = QHBoxLayout()
+        toolbar.addWidget(QLabel("From:"))
+        self.pur_date_from = QDateEdit()
+        self.pur_date_from.setCalendarPopup(True)
+        self.pur_date_from.setDate(QDate.currentDate().addYears(-1))
+        toolbar.addWidget(self.pur_date_from)
+        toolbar.addWidget(QLabel("To:"))
+        self.pur_date_to = QDateEdit()
+        self.pur_date_to.setCalendarPopup(True)
+        self.pur_date_to.setDate(QDate.currentDate())
+        toolbar.addWidget(self.pur_date_to)
         self.btn_refresh_pur = QPushButton("Refresh")
         self.btn_export_pur = QPushButton("Export Excel")
         toolbar.addStretch()
@@ -70,6 +81,16 @@ class RegisterReportWidget(QWidget):
         layout.addWidget(header)
 
         toolbar = QHBoxLayout()
+        toolbar.addWidget(QLabel("From:"))
+        self.sal_date_from = QDateEdit()
+        self.sal_date_from.setCalendarPopup(True)
+        self.sal_date_from.setDate(QDate.currentDate().addYears(-1))
+        toolbar.addWidget(self.sal_date_from)
+        toolbar.addWidget(QLabel("To:"))
+        self.sal_date_to = QDateEdit()
+        self.sal_date_to.setCalendarPopup(True)
+        self.sal_date_to.setDate(QDate.currentDate())
+        toolbar.addWidget(self.sal_date_to)
         self.btn_refresh_sal = QPushButton("Refresh")
         self.btn_export_sal = QPushButton("Export Excel")
         toolbar.addStretch()
@@ -118,7 +139,10 @@ class RegisterReportWidget(QWidget):
         session = self.session_factory()
         try:
             svc = ReportService(session)
-            data = svc.purchase_register()
+            data = svc.purchase_register(
+                date_from=self.pur_date_from.date().toString("yyyy-MM-dd"),
+                date_to=self.pur_date_to.date().toString("yyyy-MM-dd"),
+            )
             self.pur_table.setRowCount(len(data))
             for row, d in enumerate(data):
                 self.pur_table.setItem(row, 0, QTableWidgetItem(d["bill_no"]))
@@ -134,7 +158,10 @@ class RegisterReportWidget(QWidget):
         session = self.session_factory()
         try:
             svc = ReportService(session)
-            data = svc.sales_register()
+            data = svc.sales_register(
+                date_from=self.sal_date_from.date().toString("yyyy-MM-dd"),
+                date_to=self.sal_date_to.date().toString("yyyy-MM-dd"),
+            )
             self.sal_table.setRowCount(len(data))
             for row, d in enumerate(data):
                 self.sal_table.setItem(row, 0, QTableWidgetItem(d["invoice_no"]))

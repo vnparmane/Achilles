@@ -70,6 +70,18 @@ class PartyService:
         self.session.commit()
         return party
 
+    def delete_party(self, party_id: int) -> bool:
+        party = self.session.get(Party, party_id)
+        if party is None:
+            return False
+        try:
+            self.session.delete(party)
+            self.session.commit()
+            return True
+        except Exception:
+            self.session.rollback()
+            raise
+
     def search_parties(self, query: str) -> list[Party]:
         stmt = select(Party).where(
             Party.name.ilike(f"%{query}%") | Party.code.ilike(f"%{query}%")

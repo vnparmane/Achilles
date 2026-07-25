@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QHeaderView,
     QLabel, QComboBox, QDoubleSpinBox,
     QMessageBox, QDateEdit, QTextEdit, QFrame, QFormLayout,
-    QGroupBox, QAbstractItemView, QTabWidget,
+    QGroupBox, QAbstractItemView, QTabWidget, QDialog,
 )
 from PySide6.QtCore import Qt, Slot, QDate
 from PySide6.QtGui import QFont
@@ -171,6 +171,15 @@ class PurchaseBillWidget(QWidget):
         hf.setBold(True)
         header.setFont(hf)
         layout.addWidget(header)
+
+        toolbar = QHBoxLayout()
+        self.btn_view = QPushButton("View Details")
+        self.btn_refresh_list = QPushButton("Refresh")
+        toolbar.addWidget(self.btn_view)
+        toolbar.addStretch()
+        toolbar.addWidget(self.btn_refresh_list)
+        layout.addLayout(toolbar)
+
         self.lv_table = QTableWidget()
         self.lv_table.setColumnCount(5)
         self.lv_table.setHorizontalHeaderLabels(["Bill No", "Date", "Vendor", "Amount", "Status"])
@@ -179,6 +188,10 @@ class PurchaseBillWidget(QWidget):
         self.lv_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.lv_table.setAlternatingRowColors(True)
         layout.addWidget(self.lv_table)
+
+        self.btn_view.clicked.connect(self._view_bill)
+        self.btn_refresh_list.clicked.connect(self._load_list)
+        self.lv_table.doubleClicked.connect(self._view_bill)
         self._load_list()
 
     def _load_list(self):
@@ -188,11 +201,69 @@ class PurchaseBillWidget(QWidget):
             bills = svc.get_all_bills()
             self.lv_table.setRowCount(len(bills))
             for row, b in enumerate(bills):
-                self.lv_table.setItem(row, 0, QTableWidgetItem(b.bill_no))
+                item = QTableWidgetItem(b.bill_no)
+                item.setData(Qt.ItemDataRole.UserRole, b.id)
+                self.lv_table.setItem(row, 0, item)
                 self.lv_table.setItem(row, 1, QTableWidgetItem(b.bill_date))
                 self.lv_table.setItem(row, 2, QTableWidgetItem(b.party.name if b.party else ""))
                 self.lv_table.setItem(row, 3, QTableWidgetItem(f"₹{b.grand_total:,.2f}"))
                 self.lv_table.setItem(row, 4, QTableWidgetItem(b.status))
+        finally:
+            session.close()
+
+    @Slot()
+    def _view_bill(self):
+        row = self.lv_table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "Select", "Please select a bill.")
+            return
+        bill_id = self.lv_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
+        session = self.session_factory()
+        try:
+            svc = PurchaseService(session)
+            bill = svc.get_bill_by_id(bill_id)
+            if bill is None:
+                return
+            dialog = QDialog(self)
+            dialog.setWindowTitle(f"Purchase Bill: {bill.bill_no}")
+            dialog.setMinimumSize(600, 400)
+            dl = QVBoxLayout(dialog)
+            info = QFormLayout()
+            info.addRow("Bill No:", QLabel(bill.bill_no))
+            info.addRow("Date:", QLabel(bill.bill_date))
+            info.addRow("Vendor:", QLabel(bill.party.name if bill.party else ""))
+            info.addRow("Godown:", QLabel(bill.godown.name if bill.godown else ""))
+            dl.addLayout(info)
+            table = QTableWidget()
+            table.setColumnCount(5)
+            table.setHorizontalHeaderLabels(["Item", "Qty", "Rate", "Amount", "GST%"])
+            table.horizontalHeader().setStretchLastSection(True)
+            table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+            table.setRowCount(len(bill.items))
+            for r, item in enumerate(bill.items):
+                table.setItem(r, 0, QTableWidgetItem(item.item.name if item.item else ""))
+                table.setItem(r, 1, QTableWidgetItem(f"{item.quantity:.3f}"))
+                table.setItem(r, 2, QTableWidgetItem(f"{item.rate:.2f}"))
+                table.setItem(r, 3, QTableWidgetItem(f"{item.amount:.2f}"))
+                table.setItem(r, 4, QTableWidgetItem(f"{item.gst_rate}%"))
+            dl.addWidget(table)
+            totals = QFormLayout()
+            totals.addRow("Gross:", QLabel(f"₹{bill.gross_amount:,.2f}"))
+            totals.addRow("Taxable:", QLabel(f"₹{bill.taxable_amount:,.2f}"))
+            totals.addRow("CGST:", QLabel(f"₹{bill.cgst_total:,.2f}"))
+            totals.addRow("SGST:", QLabel(f"₹{bill.sgst_total:,.2f}"))
+            totals.addRow("IGST:", QLabel(f"₹{bill.igst_total:,.2f}"))
+            gl = QLabel(f"₹{bill.grand_total:,.2f}")
+            gf = QFont()
+            gf.setBold(True)
+            gf.setPointSize(12)
+            gl.setFont(gf)
+            totals.addRow("Grand Total:", gl)
+            dl.addLayout(totals)
+            btn = QPushButton("Close")
+            btn.clicked.connect(dialog.accept)
+            dl.addWidget(btn, alignment=Qt.AlignmentFlag.AlignRight)
+            dialog.exec()
         finally:
             session.close()
 

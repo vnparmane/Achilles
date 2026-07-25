@@ -3,9 +3,9 @@ import os
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QLabel,
-    QAbstractItemView, QFileDialog, QMessageBox,
+    QAbstractItemView, QFileDialog, QMessageBox, QDateEdit,
 )
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QDate
 from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
@@ -27,6 +27,16 @@ class GSTReportWidget(QWidget):
         layout.addWidget(header)
 
         toolbar = QHBoxLayout()
+        toolbar.addWidget(QLabel("From:"))
+        self.date_from = QDateEdit()
+        self.date_from.setCalendarPopup(True)
+        self.date_from.setDate(QDate.currentDate().addYears(-1))
+        toolbar.addWidget(self.date_from)
+        toolbar.addWidget(QLabel("To:"))
+        self.date_to = QDateEdit()
+        self.date_to.setCalendarPopup(True)
+        self.date_to.setDate(QDate.currentDate())
+        toolbar.addWidget(self.date_to)
         self.btn_refresh = QPushButton("Refresh")
         self.btn_export = QPushButton("Export Excel")
         toolbar.addStretch()
@@ -62,7 +72,10 @@ class GSTReportWidget(QWidget):
         session = self.session_factory()
         try:
             svc = ReportService(session)
-            data = svc.gst_summary()
+            data = svc.gst_summary(
+                date_from=self.date_from.date().toString("yyyy-MM-dd"),
+                date_to=self.date_to.date().toString("yyyy-MM-dd"),
+            )
             self.table.setRowCount(len(data))
             cgst_t = sgst_t = igst_t = 0.0
             for row, d in enumerate(data):

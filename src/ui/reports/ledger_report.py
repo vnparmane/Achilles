@@ -4,8 +4,9 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QHeaderView, QLabel,
     QComboBox, QAbstractItemView, QFileDialog, QMessageBox,
+    QDateEdit,
 )
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QDate
 from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
@@ -32,6 +33,18 @@ class LedgerReportWidget(QWidget):
         self.party_combo = QComboBox()
         self.party_combo.addItem("-- Select --", None)
         top.addWidget(self.party_combo, 1)
+
+        top.addWidget(QLabel("From:"))
+        self.date_from = QDateEdit()
+        self.date_from.setCalendarPopup(True)
+        self.date_from.setDate(QDate.currentDate().addYears(-1))
+        top.addWidget(self.date_from)
+        top.addWidget(QLabel("To:"))
+        self.date_to = QDateEdit()
+        self.date_to.setCalendarPopup(True)
+        self.date_to.setDate(QDate.currentDate())
+        top.addWidget(self.date_to)
+
         self.btn_show = QPushButton("Show Ledger")
         top.addWidget(self.btn_show)
         self.btn_export = QPushButton("Export Excel")
@@ -86,7 +99,11 @@ class LedgerReportWidget(QWidget):
         session = self.session_factory()
         try:
             svc = ReportService(session)
-            entries = svc.party_ledger(party_id)
+            entries = svc.party_ledger(
+                party_id,
+                date_from=self.date_from.date().toString("yyyy-MM-dd"),
+                date_to=self.date_to.date().toString("yyyy-MM-dd"),
+            )
             self.table.setRowCount(len(entries))
             balance = 0.0
             for row, e in enumerate(entries):

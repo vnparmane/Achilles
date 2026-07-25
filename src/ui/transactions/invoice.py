@@ -223,6 +223,7 @@ class SalesInvoiceWidget(QWidget):
 
         self.btn_print.clicked.connect(self._print_pdf)
         self.btn_refresh_list.clicked.connect(self._load_list)
+        self.lv_table.doubleClicked.connect(self._print_pdf)
         self._load_list()
 
     def _load_list(self):

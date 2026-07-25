@@ -54,6 +54,18 @@ class ItemService:
         self.session.commit()
         return item
 
+    def delete_item(self, item_id: int) -> bool:
+        item = self.session.get(Item, item_id)
+        if item is None:
+            return False
+        try:
+            self.session.delete(item)
+            self.session.commit()
+            return True
+        except Exception:
+            self.session.rollback()
+            raise
+
     def search_items(self, query: str) -> list[Item]:
         stmt = select(Item).where(
             Item.name.ilike(f"%{query}%") | Item.code.ilike(f"%{query}%")

@@ -20,6 +20,18 @@ class GodownService:
     def get_godown_by_id(self, godown_id: int) -> Godown | None:
         return self.session.get(Godown, godown_id)
 
+    def delete_godown(self, godown_id: int) -> bool:
+        godown = self.session.get(Godown, godown_id)
+        if godown is None:
+            return False
+        try:
+            self.session.delete(godown)
+            self.session.commit()
+            return True
+        except Exception:
+            self.session.rollback()
+            raise
+
     def update_godown(self, godown_id: int, **kwargs) -> Godown | None:
         godown = self.session.get(Godown, godown_id)
         if godown is None:

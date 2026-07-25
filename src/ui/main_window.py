@@ -21,6 +21,7 @@ NAV_ITEMS = [
     ("Purchase Bill", "purchase", None),
     ("Sales Invoice", "invoice", None),
     ("Payment", "payment", None),
+    ("Stock Adjustment", "stock_adjustment", None),
     ("", None, None),
     ("REPORTS", None, None),
     ("Stock Report", "stock_report", None),
@@ -169,6 +170,7 @@ class MainWindow(QMainWindow):
         from src.ui.transactions.purchase import PurchaseBillWidget
         from src.ui.transactions.invoice import SalesInvoiceWidget
         from src.ui.transactions.payment import PaymentEntryWidget
+        from src.ui.transactions.stock_adjustment import StockAdjustmentWidget
         from src.ui.reports.stock_report import StockReportWidget
         from src.ui.reports.ledger_report import LedgerReportWidget
         from src.ui.reports.gst_report import GSTReportWidget
@@ -183,6 +185,7 @@ class MainWindow(QMainWindow):
             "purchase": lambda sf: PurchaseBillWidget(sf, self.current_user),
             "invoice": lambda sf: SalesInvoiceWidget(sf, self.current_user),
             "payment": lambda sf: PaymentEntryWidget(sf, self.current_user),
+            "stock_adjustment": lambda sf: StockAdjustmentWidget(sf, self.current_user),
             "stock_report": StockReportWidget,
             "ledger": LedgerReportWidget,
             "gst_report": GSTReportWidget,

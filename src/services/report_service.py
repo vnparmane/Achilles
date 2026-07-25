@@ -57,14 +57,17 @@ class ReportService:
             for t in txns
         ]
 
-    def party_ledger(self, party_id: int) -> list[dict]:
+    def party_ledger(self, party_id: int, date_from: str | None = None, date_to: str | None = None) -> list[dict]:
         entries: list[dict] = []
-        invoices = self.session.scalars(
-            select(SalesInvoice).where(
-                SalesInvoice.party_id == party_id,
-                SalesInvoice.status == "confirmed",
-            ).order_by(SalesInvoice.invoice_date)
-        ).all()
+        inv_q = select(SalesInvoice).where(
+            SalesInvoice.party_id == party_id,
+            SalesInvoice.status == "confirmed",
+        )
+        if date_from:
+            inv_q = inv_q.where(SalesInvoice.invoice_date >= date_from)
+        if date_to:
+            inv_q = inv_q.where(SalesInvoice.invoice_date <= date_to)
+        invoices = self.session.scalars(inv_q.order_by(SalesInvoice.invoice_date)).all()
         for inv in invoices:
             entries.append({
                 "date": inv.invoice_date,
@@ -73,12 +76,15 @@ class ReportService:
                 "credit": 0.0,
             })
 
-        bills = self.session.scalars(
-            select(PurchaseBill).where(
-                PurchaseBill.party_id == party_id,
-                PurchaseBill.status == "confirmed",
-            ).order_by(PurchaseBill.bill_date)
-        ).all()
+        bill_q = select(PurchaseBill).where(
+            PurchaseBill.party_id == party_id,
+            PurchaseBill.status == "confirmed",
+        )
+        if date_from:
+            bill_q = bill_q.where(PurchaseBill.bill_date >= date_from)
+        if date_to:
+            bill_q = bill_q.where(PurchaseBill.bill_date <= date_to)
+        bills = self.session.scalars(bill_q.order_by(PurchaseBill.bill_date)).all()
         for b in bills:
             entries.append({
                 "date": b.bill_date,
@@ -87,11 +93,14 @@ class ReportService:
                 "credit": b.grand_total,
             })
 
-        payments = self.session.scalars(
-            select(PaymentTransaction).where(
-                PaymentTransaction.party_id == party_id,
-            ).order_by(PaymentTransaction.payment_date)
-        ).all()
+        pay_q = select(PaymentTransaction).where(
+            PaymentTransaction.party_id == party_id,
+        )
+        if date_from:
+            pay_q = pay_q.where(PaymentTransaction.payment_date >= date_from)
+        if date_to:
+            pay_q = pay_q.where(PaymentTransaction.payment_date <= date_to)
+        payments = self.session.scalars(pay_q.order_by(PaymentTransaction.payment_date)).all()
         for p in payments:
             desc = f"Payment ({p.mode})"
             if p.reference_no:
@@ -118,12 +127,15 @@ class ReportService:
             e["balance"] = round(balance, 2)
         return entries
 
-    def gst_summary(self) -> list[dict]:
-        invoices = self.session.scalars(
-            select(SalesInvoiceItem).join(SalesInvoice).where(
-                SalesInvoice.status == "confirmed"
-            )
-        ).all()
+    def gst_summary(self, date_from: str | None = None, date_to: str | None = None) -> list[dict]:
+        q = select(SalesInvoiceItem).join(SalesInvoice).where(
+            SalesInvoice.status == "confirmed"
+        )
+        if date_from:
+            q = q.where(SalesInvoice.invoice_date >= date_from)
+        if date_to:
+            q = q.where(SalesInvoice.invoice_date <= date_to)
+        invoices = self.session.scalars(q).all()
         summary: dict[float, dict] = {}
         for item in invoices:
             rate = item.gst_rate
@@ -140,12 +152,13 @@ class ReportService:
             for v in summary.values()
         ]
 
-    def purchase_register(self) -> list[dict]:
-        bills = self.session.scalars(
-            select(PurchaseBill).where(
-                PurchaseBill.status == "confirmed"
-            ).order_by(PurchaseBill.bill_date.desc())
-        ).all()
+    def purchase_register(self, date_from: str | None = None, date_to: str | None = None) -> list[dict]:
+        q = select(PurchaseBill).where(PurchaseBill.status == "confirmed")
+        if date_from:
+            q = q.where(PurchaseBill.bill_date >= date_from)
+        if date_to:
+            q = q.where(PurchaseBill.bill_date <= date_to)
+        bills = self.session.scalars(q.order_by(PurchaseBill.bill_date.desc())).all()
         return [
             {
                 "bill_no": b.bill_no, "date": b.bill_date,
@@ -206,12 +219,13 @@ class ReportService:
         ]
         return result
 
-    def sales_register(self) -> list[dict]:
-        invoices = self.session.scalars(
-            select(SalesInvoice).where(
-                SalesInvoice.status == "confirmed"
-            ).order_by(SalesInvoice.invoice_date.desc())
-        ).all()
+    def sales_register(self, date_from: str | None = None, date_to: str | None = None) -> list[dict]:
+        q = select(SalesInvoice).where(SalesInvoice.status == "confirmed")
+        if date_from:
+            q = q.where(SalesInvoice.invoice_date >= date_from)
+        if date_to:
+            q = q.where(SalesInvoice.invoice_date <= date_to)
+        invoices = self.session.scalars(q.order_by(SalesInvoice.invoice_date.desc())).all()
         return [
             {
                 "invoice_no": inv.invoice_no, "date": inv.invoice_date,

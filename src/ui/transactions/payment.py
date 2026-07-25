@@ -1,8 +1,8 @@
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QPushButton,
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QLabel, QComboBox, QDoubleSpinBox,
     QMessageBox, QDateEdit, QLineEdit, QFormLayout,
-    QAbstractItemView, QTabWidget, QGroupBox,
+    QAbstractItemView, QTabWidget, QGroupBox, QDialog,
 )
 from PySide6.QtCore import Qt, Slot, QDate
 from PySide6.QtGui import QFont
@@ -113,6 +113,44 @@ class PaymentEntryWidget(QWidget):
 
         self.btn_save.clicked.connect(self._save)
 
+    @Slot()
+    def _view_payment(self):
+        row = self.lv_table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "Select", "Please select a payment.")
+            return
+        payment_id = self.lv_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
+        session = self.session_factory()
+        try:
+            svc = PaymentService(session)
+            p = svc.get_payment_by_id(payment_id)
+            if p is None:
+                return
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Payment Details")
+            dialog.setMinimumWidth(400)
+            dl = QVBoxLayout(dialog)
+            f = QFormLayout()
+            f.addRow("Date:", QLabel(p.payment_date))
+            f.addRow("Type:", QLabel(p.payment_type.capitalize()))
+            f.addRow("Party:", QLabel(p.party.name if p.party else ""))
+            f.addRow("Mode:", QLabel(p.mode.capitalize()))
+            f.addRow("Reference:", QLabel(p.reference_no or ""))
+            amt = QLabel(f"₹{p.amount:,.2f}")
+            af = QFont()
+            af.setBold(True)
+            af.setPointSize(12)
+            amt.setFont(af)
+            f.addRow("Amount:", amt)
+            f.addRow("Notes:", QLabel(p.notes or ""))
+            dl.addLayout(f)
+            btn = QPushButton("Close")
+            btn.clicked.connect(dialog.accept)
+            dl.addWidget(btn, alignment=Qt.AlignmentFlag.AlignRight)
+            dialog.exec()
+        finally:
+            session.close()
+
     def _setup_list(self):
         self.list_tab = QWidget()
         layout = QVBoxLayout(self.list_tab)
@@ -123,6 +161,15 @@ class PaymentEntryWidget(QWidget):
         hf.setBold(True)
         header.setFont(hf)
         layout.addWidget(header)
+
+        toolbar = QHBoxLayout()
+        self.btn_view = QPushButton("View Details")
+        self.btn_refresh_list = QPushButton("Refresh")
+        toolbar.addWidget(self.btn_view)
+        toolbar.addStretch()
+        toolbar.addWidget(self.btn_refresh_list)
+        layout.addLayout(toolbar)
+
         self.lv_table = QTableWidget()
         self.lv_table.setColumnCount(6)
         self.lv_table.setHorizontalHeaderLabels(["Date", "Type", "Party", "Mode", "Amount", "Ref No"])
@@ -131,6 +178,10 @@ class PaymentEntryWidget(QWidget):
         self.lv_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.lv_table.setAlternatingRowColors(True)
         layout.addWidget(self.lv_table)
+
+        self.btn_view.clicked.connect(self._view_payment)
+        self.btn_refresh_list.clicked.connect(self._load_list)
+        self.lv_table.doubleClicked.connect(self._view_payment)
         self._load_list()
 
     def _load_list(self):
@@ -140,7 +191,9 @@ class PaymentEntryWidget(QWidget):
             payments = svc.get_all_payments()
             self.lv_table.setRowCount(len(payments))
             for row, p in enumerate(payments):
-                self.lv_table.setItem(row, 0, QTableWidgetItem(p.payment_date))
+                item = QTableWidgetItem(p.payment_date)
+                item.setData(Qt.ItemDataRole.UserRole, p.id)
+                self.lv_table.setItem(row, 0, item)
                 self.lv_table.setItem(row, 1, QTableWidgetItem(p.payment_type.capitalize()))
                 self.lv_table.setItem(row, 2, QTableWidgetItem(p.party.name if p.party else ""))
                 self.lv_table.setItem(row, 3, QTableWidgetItem(p.mode.capitalize()))

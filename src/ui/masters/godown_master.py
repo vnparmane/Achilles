@@ -86,9 +86,12 @@ class GodownMasterWidget(QWidget):
         toolbar = QHBoxLayout()
         self.btn_add = QPushButton("+ New Godown")
         self.btn_edit = QPushButton("Edit")
+        self.btn_delete = QPushButton("Delete")
+        self.btn_delete.setObjectName("dangerButton")
         self.btn_refresh = QPushButton("Refresh")
         toolbar.addWidget(self.btn_add)
         toolbar.addWidget(self.btn_edit)
+        toolbar.addWidget(self.btn_delete)
         toolbar.addStretch()
         toolbar.addWidget(self.btn_refresh)
         layout.addLayout(toolbar)
@@ -106,6 +109,7 @@ class GodownMasterWidget(QWidget):
 
         self.btn_add.clicked.connect(self._add)
         self.btn_edit.clicked.connect(self._edit)
+        self.btn_delete.clicked.connect(self._delete)
         self.btn_refresh.clicked.connect(self._load)
         self.table.doubleClicked.connect(self._edit)
         self._load()
@@ -154,5 +158,28 @@ class GodownMasterWidget(QWidget):
             dialog = GodownDialog(svc, godown, self)
             if dialog.exec():
                 self._load()
+        finally:
+            session.close()
+
+    @Slot()
+    def _delete(self):
+        row = self.table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "Select", "Please select a godown to delete.")
+            return
+        godown_id = self.table.item(row, 0).data(Qt.ItemDataRole.UserRole)
+        reply = QMessageBox.question(
+            self, "Confirm Delete",
+            "Delete this godown? This cannot be undone.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply != QMessageBox.StandardButton.Yes:
+            return
+        session, svc = self._get_session_and_service()
+        try:
+            svc.delete_godown(godown_id)
+            self._load()
+        except Exception as e:
+            QMessageBox.warning(self, "Cannot Delete", f"Godown has existing transactions: {e}")
         finally:
             session.close()
