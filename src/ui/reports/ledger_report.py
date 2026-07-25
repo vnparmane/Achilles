@@ -1,13 +1,16 @@
+import os
+
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QHeaderView, QLabel,
-    QComboBox, QAbstractItemView,
+    QComboBox, QAbstractItemView, QFileDialog, QMessageBox,
 )
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
 from src.services.party_service import PartyService
+from src.reports.excel_generator import export_table_widget_to_excel
 
 
 class LedgerReportWidget(QWidget):
@@ -31,6 +34,8 @@ class LedgerReportWidget(QWidget):
         top.addWidget(self.party_combo, 1)
         self.btn_show = QPushButton("Show Ledger")
         top.addWidget(self.btn_show)
+        self.btn_export = QPushButton("Export Excel")
+        top.addWidget(self.btn_export)
         layout.addLayout(top)
 
         self.table = QTableWidget()
@@ -50,7 +55,19 @@ class LedgerReportWidget(QWidget):
         layout.addWidget(self.lbl_balance)
 
         self.btn_show.clicked.connect(self._load)
+        self.btn_export.clicked.connect(self._export)
         self._populate_parties()
+
+    @Slot()
+    def _export(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "party_ledger.xlsx", "Excel (*.xlsx)")
+        if path:
+            try:
+                export_table_widget_to_excel(self.table, path)
+                QMessageBox.information(self, "Exported", f"Saved to {path}")
+                os.startfile(path)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Export failed: {e}")
 
     def _populate_parties(self):
         session = self.session_factory()

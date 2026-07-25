@@ -1,12 +1,15 @@
+import os
+
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QLabel,
-    QAbstractItemView,
+    QAbstractItemView, QFileDialog, QMessageBox,
 )
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
+from src.reports.excel_generator import export_table_widget_to_excel
 
 
 class GSTReportWidget(QWidget):
@@ -25,7 +28,9 @@ class GSTReportWidget(QWidget):
 
         toolbar = QHBoxLayout()
         self.btn_refresh = QPushButton("Refresh")
+        self.btn_export = QPushButton("Export Excel")
         toolbar.addStretch()
+        toolbar.addWidget(self.btn_export)
         toolbar.addWidget(self.btn_refresh)
         layout.addLayout(toolbar)
 
@@ -38,7 +43,19 @@ class GSTReportWidget(QWidget):
         layout.addWidget(self.table, 1)
 
         self.btn_refresh.clicked.connect(self._load)
+        self.btn_export.clicked.connect(self._export)
         self._load()
+
+    @Slot()
+    def _export(self):
+        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "gst_summary.xlsx", "Excel (*.xlsx)")
+        if path:
+            try:
+                export_table_widget_to_excel(self.table, path)
+                QMessageBox.information(self, "Exported", f"Saved to {path}")
+                os.startfile(path)
+            except Exception as e:
+                QMessageBox.critical(self, "Error", f"Export failed: {e}")
 
     @Slot()
     def _load(self):

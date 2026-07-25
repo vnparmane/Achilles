@@ -1,3 +1,6 @@
+import os
+import tempfile
+
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QTableWidget, QTableWidgetItem, QHeaderView,
@@ -13,6 +16,7 @@ from src.services.item_service import ItemService
 from src.services.godown_service import GodownService
 from src.services.invoice_service import InvoiceService
 from src.services.company_service import CompanyService
+from src.reports.pdf_generator import generate_invoice_pdf
 from src.utils.gst_utils import calculate_gst
 
 
@@ -168,6 +172,27 @@ class SalesInvoiceWidget(QWidget):
         self.btn_add_row.clicked.connect(self._add_row)
         self.btn_save.clicked.connect(self._save)
 
+    def _generate_and_open_pdf(self, invoice_id: int):
+        session = self.session_factory()
+        try:
+            tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+            generate_invoice_pdf(session, invoice_id, tmp.name)
+            tmp.close()
+            os.startfile(tmp.name)
+        except Exception as e:
+            QMessageBox.critical(self, "Error", f"Failed to generate PDF: {e}")
+        finally:
+            session.close()
+
+    @Slot()
+    def _print_pdf(self):
+        row = self.lv_table.currentRow()
+        if row < 0:
+            QMessageBox.information(self, "Select", "Please select an invoice.")
+            return
+        invoice_id = self.lv_table.item(row, 0).data(Qt.ItemDataRole.UserRole)
+        self._generate_and_open_pdf(invoice_id)
+
     def _setup_list(self):
         self.list_tab = QWidget()
         layout = QVBoxLayout(self.list_tab)
@@ -178,6 +203,15 @@ class SalesInvoiceWidget(QWidget):
         hf.setBold(True)
         header.setFont(hf)
         layout.addWidget(header)
+
+        toolbar = QHBoxLayout()
+        self.btn_print = QPushButton("Print PDF")
+        self.btn_refresh_list = QPushButton("Refresh")
+        toolbar.addWidget(self.btn_print)
+        toolbar.addStretch()
+        toolbar.addWidget(self.btn_refresh_list)
+        layout.addLayout(toolbar)
+
         self.lv_table = QTableWidget()
         self.lv_table.setColumnCount(5)
         self.lv_table.setHorizontalHeaderLabels(["Invoice No", "Date", "Customer", "Amount", "Status"])
@@ -186,6 +220,9 @@ class SalesInvoiceWidget(QWidget):
         self.lv_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.lv_table.setAlternatingRowColors(True)
         layout.addWidget(self.lv_table)
+
+        self.btn_print.clicked.connect(self._print_pdf)
+        self.btn_refresh_list.clicked.connect(self._load_list)
         self._load_list()
 
     def _load_list(self):
@@ -195,7 +232,9 @@ class SalesInvoiceWidget(QWidget):
             invoices = svc.get_all_invoices()
             self.lv_table.setRowCount(len(invoices))
             for row, inv in enumerate(invoices):
-                self.lv_table.setItem(row, 0, QTableWidgetItem(inv.invoice_no))
+                item = QTableWidgetItem(inv.invoice_no)
+                item.setData(Qt.ItemDataRole.UserRole, inv.id)
+                self.lv_table.setItem(row, 0, item)
                 self.lv_table.setItem(row, 1, QTableWidgetItem(inv.invoice_date))
                 self.lv_table.setItem(row, 2, QTableWidgetItem(inv.party.name if inv.party else ""))
                 self.lv_table.setItem(row, 3, QTableWidgetItem(f"₹{inv.grand_total:,.2f}"))
@@ -291,7 +330,7 @@ class SalesInvoiceWidget(QWidget):
         session = self.session_factory()
         try:
             svc = InvoiceService(session)
-            svc.create_invoice(
+            invoice = svc.create_invoice(
                 party_id=customer_id,
                 godown_id=godown_id,
                 items=self._items_data,
@@ -301,12 +340,17 @@ class SalesInvoiceWidget(QWidget):
                 notes=self.notes_edit.toPlainText().strip() or None,
                 created_by=self.current_user.id,
             )
-            QMessageBox.information(self, "Success", "Invoice saved successfully!")
+            self._load_list()
+            reply = QMessageBox.question(
+                self, "Print", "Invoice saved. Print PDF?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            )
+            if reply == QMessageBox.StandardButton.Yes:
+                self._generate_and_open_pdf(invoice.id)
             self._items_data.clear()
             self._refresh_table()
             self.discount_spin.setValue(0)
             self.notes_edit.clear()
-            self._load_list()
             self.tabs.setCurrentIndex(1)
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed: {e}")
