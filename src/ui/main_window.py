@@ -164,6 +164,8 @@ class MainWindow(QMainWindow):
         from src.ui.masters.party_master import PartyMasterWidget
         from src.ui.masters.item_master import ItemMasterWidget
         from src.ui.masters.godown_master import GodownMasterWidget
+        from src.ui.masters.company_master import CompanyMasterWidget
+        from src.ui.masters.user_master import UserMasterWidget
         from src.ui.transactions.purchase import PurchaseBillWidget
         from src.ui.transactions.invoice import SalesInvoiceWidget
         from src.ui.transactions.payment import PaymentEntryWidget
@@ -176,6 +178,8 @@ class MainWindow(QMainWindow):
             "party": PartyMasterWidget,
             "item": ItemMasterWidget,
             "godown": GodownMasterWidget,
+            "company": CompanyMasterWidget,
+            "users": UserMasterWidget,
             "purchase": lambda sf: PurchaseBillWidget(sf, self.current_user),
             "invoice": lambda sf: SalesInvoiceWidget(sf, self.current_user),
             "payment": lambda sf: PaymentEntryWidget(sf, self.current_user),
