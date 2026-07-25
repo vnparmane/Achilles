@@ -1,0 +1,7 @@
+PySide6>=6.11
+SQLAlchemy>=2.0
+alembic>=1.18
+reportlab>=5.0
+openpyxl>=3.1
+pytest>=9.0
+ruff>=0.11

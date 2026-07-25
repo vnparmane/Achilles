@@ -1,0 +1,59 @@
+# Normalize text files
+
+* text=auto
+
+# Python files - always use LF
+
+*.py text eol=lf
+
+# Common project files
+
+*.md text eol=lf
+*.txt text eol=lf
+*.json text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+
+# Shell scripts - always LF
+
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Web files
+
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+
+# Windows scripts
+
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files - do not modify
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.exe binary
+*.dll binary
+
+# Ignore generated files
+
+*.pyc binary
+*.pyo binary
+*.so binary
+*.dll binary
+*.class binary
