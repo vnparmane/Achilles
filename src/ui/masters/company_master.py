@@ -1,13 +1,19 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QFormLayout, QPushButton,
-    QLineEdit, QComboBox, QMessageBox, QLabel,
-    QScrollArea, QGroupBox,
-)
 from PySide6.QtCore import Slot
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QComboBox,
+    QFormLayout,
+    QGroupBox,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QScrollArea,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.services.company_service import CompanyService
-from src.ui.setup_wizard import INDIAN_STATES
+from src.ui.helpers import make_header
+from src.utils.constants import INDIAN_STATES
 
 
 class CompanyMasterWidget(QWidget):
@@ -24,12 +30,7 @@ class CompanyMasterWidget(QWidget):
         layout.setContentsMargins(16, 16, 16, 16)
         layout.setSpacing(16)
 
-        header = QLabel("Company Settings")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Company Settings"))
 
         company_group = QGroupBox("Company Information")
         company_form = QFormLayout(company_group)

@@ -1,8 +1,8 @@
 import pytest
 
 from src.database.engine import create_db_engine, create_session_factory
+from src.database.models import Company, Godown, Item, Party, User
 from src.database.models.base import Base
-from src.database.models import Company, Party, Item, Godown, User
 
 
 @pytest.fixture

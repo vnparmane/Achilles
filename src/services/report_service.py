@@ -1,14 +1,14 @@
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.database.models.item import Item
-from src.database.models.stock import StockTransaction
-from src.database.models.purchase import PurchaseBill
 from src.database.models.invoice import SalesInvoice, SalesInvoiceItem
-from src.database.models.payment import PaymentTransaction
+from src.database.models.item import Item
 from src.database.models.party import Party
+from src.database.models.payment import PaymentTransaction
+from src.database.models.purchase import PurchaseBill
+from src.database.models.stock import StockTransaction
 
 
 class ReportService:
@@ -171,7 +171,7 @@ class ReportService:
         ]
 
     def dashboard_summary(self) -> dict:
-        today = date.today().isoformat()
+        today = datetime.now().date().isoformat()
         result = {
             "today_sales": 0.0,
             "total_receivables": 0.0,

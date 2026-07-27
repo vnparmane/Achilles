@@ -1,7 +1,6 @@
 import hashlib
 
 import bcrypt
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -38,11 +37,10 @@ class UserService:
             return None
         if _check_password(password, user.password_hash):
             return user
-        if _is_sha256_hash(user.password_hash):
-            if user.password_hash == hashlib.sha256(password.encode()).hexdigest():
-                user.password_hash = _hash_password(password)
-                self.session.commit()
-                return user
+        if _is_sha256_hash(user.password_hash) and user.password_hash == hashlib.sha256(password.encode()).hexdigest():
+            user.password_hash = _hash_password(password)
+            self.session.commit()
+            return user
         return None
 
     def create_user(

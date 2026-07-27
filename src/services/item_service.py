@@ -66,8 +66,4 @@ class ItemService:
             self.session.rollback()
             raise
 
-    def search_items(self, query: str) -> list[Item]:
-        stmt = select(Item).where(
-            Item.name.ilike(f"%{query}%") | Item.code.ilike(f"%{query}%")
-        ).order_by(Item.name)
-        return list(self.session.scalars(stmt).all())
+

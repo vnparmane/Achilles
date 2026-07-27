@@ -1,16 +1,19 @@
-import os
-
+from PySide6.QtCore import QDate, Slot
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel,
-    QAbstractItemView, QTabWidget, QFileDialog, QMessageBox,
+    QAbstractItemView,
     QDateEdit,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Slot, QDate
-from PySide6.QtGui import QFont
 
 from src.services.report_service import ReportService
-from src.reports.excel_generator import export_table_widget_to_excel
+from src.ui.helpers import make_header, export_dialog
 
 
 class RegisterReportWidget(QWidget):
@@ -32,12 +35,7 @@ class RegisterReportWidget(QWidget):
         self.purchase_tab = QWidget()
         layout = QVBoxLayout(self.purchase_tab)
         layout.setContentsMargins(16, 16, 16, 16)
-        header = QLabel("Purchase Register")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Purchase Register"))
 
         toolbar = QHBoxLayout()
         toolbar.addWidget(QLabel("From:"))
@@ -73,12 +71,7 @@ class RegisterReportWidget(QWidget):
         self.sales_tab = QWidget()
         layout = QVBoxLayout(self.sales_tab)
         layout.setContentsMargins(16, 16, 16, 16)
-        header = QLabel("Sales Register")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Sales Register"))
 
         toolbar = QHBoxLayout()
         toolbar.addWidget(QLabel("From:"))
@@ -115,25 +108,11 @@ class RegisterReportWidget(QWidget):
 
     @Slot()
     def _export_purchase(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "purchase_register.xlsx", "Excel (*.xlsx)")
-        if path:
-            try:
-                export_table_widget_to_excel(self.pur_table, path)
-                QMessageBox.information(self, "Exported", f"Saved to {path}")
-                os.startfile(path)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Export failed: {e}")
+        export_dialog(self, self.pur_table, "purchase_register.xlsx")
 
     @Slot()
     def _export_sales(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "sales_register.xlsx", "Excel (*.xlsx)")
-        if path:
-            try:
-                export_table_widget_to_excel(self.sal_table, path)
-                QMessageBox.information(self, "Exported", f"Saved to {path}")
-                os.startfile(path)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Export failed: {e}")
+        export_dialog(self, self.sal_table, "sales_register.xlsx")
 
     def _load_purchase(self):
         session = self.session_factory()

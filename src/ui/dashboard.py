@@ -1,11 +1,15 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-    QFrame,
-)
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.services.report_service import ReportService
+from src.ui.helpers import make_header
 
 
 class SummaryCard(QFrame):
@@ -54,12 +58,7 @@ class DashboardWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(24, 24, 24, 24)
 
-        header = QLabel("Dashboard")
-        hf = QFont()
-        hf.setPointSize(18)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Dashboard", 18))
 
         subtitle = QLabel("Welcome to TextileERP")
         subtitle.setStyleSheet("color: #666; margin-bottom: 12px;")
@@ -82,12 +81,7 @@ class DashboardWidget(QWidget):
 
         layout.addLayout(cards_layout)
 
-        actions_label = QLabel("Quick Actions")
-        af = QFont()
-        af.setPointSize(14)
-        af.setBold(True)
-        actions_label.setFont(af)
-        layout.addWidget(actions_label)
+        layout.addWidget(make_header("Quick Actions"))
 
         actions_layout = QHBoxLayout()
         actions_layout.setSpacing(12)

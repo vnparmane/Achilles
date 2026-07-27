@@ -1,8 +1,8 @@
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.database.models.stock import StockTransaction
 from src.database.models.item import Item
+from src.database.models.stock import StockTransaction
 
 
 class StockService:

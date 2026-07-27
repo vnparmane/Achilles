@@ -19,5 +19,4 @@ class Company(Base):
     bank_branch: Mapped[str | None] = mapped_column(String(200))
     bank_account_no: Mapped[str | None] = mapped_column(String(50))
     bank_ifsc: Mapped[str | None] = mapped_column(String(20))
-    logo_path: Mapped[str | None] = mapped_column(String(500))
     is_active: Mapped[bool] = mapped_column(default=True)

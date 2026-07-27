@@ -1,8 +1,7 @@
 from pathlib import Path
 
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
-
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
 HEADER_FILL = PatternFill(start_color="2c3e50", end_color="2c3e50", fill_type="solid")
 HEADER_FONT = Font(color="ffffff", bold=True, size=10)

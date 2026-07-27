@@ -1,14 +1,21 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView,
-    QDialog, QFormLayout, QLineEdit,
-    QMessageBox, QLabel,
-)
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QDialog,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.database.models.godown import Godown
 from src.services.godown_service import GodownService
+from src.ui.helpers import make_header
 
 
 class GodownDialog(QDialog):
@@ -76,12 +83,7 @@ class GodownMasterWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Godowns (Storage Locations)")
-        header_font = QFont()
-        header_font.setPointSize(14)
-        header_font.setBold(True)
-        header.setFont(header_font)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Godowns (Storage Locations)"))
 
         toolbar = QHBoxLayout()
         self.btn_add = QPushButton("+ New Godown")

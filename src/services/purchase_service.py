@@ -1,11 +1,11 @@
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.database.models.purchase import PurchaseBill, PurchaseBillItem
-from src.database.models.party import Party
 from src.database.models.company import Company
+from src.database.models.party import Party
+from src.database.models.purchase import PurchaseBill, PurchaseBillItem
 from src.services.stock_service import StockService
 from src.utils.gst_utils import calculate_gst
 
@@ -16,7 +16,7 @@ class PurchaseService:
         self.stock_service = StockService(session)
 
     def _next_bill_no(self) -> str:
-        year = date.today().year % 100
+        year = datetime.now().date().year % 100
         result = self.session.execute(
             select(func.max(PurchaseBill.bill_no)).where(
                 PurchaseBill.bill_no.like(f"PUR-{year}%")
@@ -38,7 +38,7 @@ class PurchaseService:
         created_by: int | None = None,
     ) -> PurchaseBill:
         if bill_date is None:
-            bill_date = date.today().isoformat()
+            bill_date = datetime.now().date().isoformat()
 
         party = self.session.get(Party, party_id)
         company = self.session.scalar(select(Company))

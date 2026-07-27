@@ -1,14 +1,23 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView,
-    QDialog, QFormLayout, QLineEdit, QComboBox,
-    QMessageBox, QLabel, QCheckBox,
-)
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.database.models.user import User
 from src.services.user_service import UserService
+from src.ui.helpers import make_header
 from src.utils.constants import UserRole
 
 
@@ -113,12 +122,7 @@ class UserMasterWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("User Management")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("User Management"))
 
         toolbar = QHBoxLayout()
         self.btn_add = QPushButton("+ New User")

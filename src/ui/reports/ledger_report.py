@@ -1,17 +1,22 @@
-import os
-
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView, QLabel,
-    QComboBox, QAbstractItemView, QFileDialog, QMessageBox,
-    QDateEdit,
-)
-from PySide6.QtCore import Slot, QDate
+from PySide6.QtCore import QDate, Slot
 from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QComboBox,
+    QDateEdit,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
-from src.services.report_service import ReportService
 from src.services.party_service import PartyService
-from src.reports.excel_generator import export_table_widget_to_excel
+from src.services.report_service import ReportService
+from src.ui.helpers import make_header, export_dialog
 
 
 class LedgerReportWidget(QWidget):
@@ -21,12 +26,7 @@ class LedgerReportWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Party Ledger")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Party Ledger"))
 
         top = QHBoxLayout()
         top.addWidget(QLabel("Party:"))
@@ -73,14 +73,7 @@ class LedgerReportWidget(QWidget):
 
     @Slot()
     def _export(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "party_ledger.xlsx", "Excel (*.xlsx)")
-        if path:
-            try:
-                export_table_widget_to_excel(self.table, path)
-                QMessageBox.information(self, "Exported", f"Saved to {path}")
-                os.startfile(path)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Export failed: {e}")
+        export_dialog(self, self.table, "party_ledger.xlsx")
 
     def _populate_parties(self):
         session = self.session_factory()

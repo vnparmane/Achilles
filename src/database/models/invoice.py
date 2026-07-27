@@ -26,7 +26,7 @@ class SalesInvoice(Base):
 
     party = relationship("Party")
     godown = relationship("Godown")
-    items: Mapped[list["SalesInvoiceItem"]] = relationship(back_populates="invoice", cascade="all, delete-orphan")
+    items: Mapped[list[SalesInvoiceItem]] = relationship(back_populates="invoice", cascade="all, delete-orphan")
 
 
 class SalesInvoiceItem(Base):

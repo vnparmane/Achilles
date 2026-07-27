@@ -7,18 +7,6 @@ class UserRole(str, Enum):
     VIEWER = "viewer"
 
 
-class PartyType(str, Enum):
-    CUSTOMER = "customer"
-    VENDOR = "vendor"
-    BOTH = "both"
-
-
-class RegistrationType(str, Enum):
-    REGULAR = "regular"
-    COMPOSITION = "composition"
-    UNREGISTERED = "unregistered"
-
-
 class ItemUnit(str, Enum):
     METER = "meter"
     KG = "kg"
@@ -34,13 +22,6 @@ class ItemUnit(str, Enum):
     NUMBER = "number"
 
 
-class StockTransactionType(str, Enum):
-    PURCHASE = "purchase"
-    SALES = "sales"
-    ADJUSTMENT_PLUS = "adjustment_plus"
-    ADJUSTMENT_MINUS = "adjustment_minus"
-
-
 class PaymentMode(str, Enum):
     CASH = "cash"
     BANK = "bank"
@@ -49,11 +30,22 @@ class PaymentMode(str, Enum):
     CARD = "card"
 
 
-class BillStatus(str, Enum):
-    DRAFT = "draft"
-    CONFIRMED = "confirmed"
-    CANCELLED = "cancelled"
-
+INDIAN_STATES = [
+    ("", "-- Select State --"),
+    ("AP", "Andhra Pradesh"), ("AR", "Arunachal Pradesh"), ("AS", "Assam"),
+    ("BR", "Bihar"), ("CG", "Chhattisgarh"), ("GA", "Goa"),
+    ("GJ", "Gujarat"), ("HR", "Haryana"), ("HP", "Himachal Pradesh"),
+    ("JK", "Jammu and Kashmir"), ("JH", "Jharkhand"), ("KA", "Karnataka"),
+    ("KL", "Kerala"), ("MP", "Madhya Pradesh"), ("MH", "Maharashtra"),
+    ("MN", "Manipur"), ("ML", "Meghalaya"), ("MZ", "Mizoram"),
+    ("NL", "Nagaland"), ("OD", "Odisha"), ("PB", "Punjab"),
+    ("RJ", "Rajasthan"), ("SK", "Sikkim"), ("TN", "Tamil Nadu"),
+    ("TS", "Telangana"), ("TR", "Tripura"), ("UP", "Uttar Pradesh"),
+    ("UK", "Uttarakhand"), ("WB", "West Bengal"),
+    ("AN", "Andaman and Nicobar"), ("CH", "Chandigarh"),
+    ("DN", "Dadra and Nagar Haveli"), ("DD", "Daman and Diu"),
+    ("DL", "Delhi"), ("LD", "Lakshadweep"), ("PY", "Puducherry"),
+]
 
 GST_RATES = [0, 5, 12, 18, 28]
 

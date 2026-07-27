@@ -82,8 +82,4 @@ class PartyService:
             self.session.rollback()
             raise
 
-    def search_parties(self, query: str) -> list[Party]:
-        stmt = select(Party).where(
-            Party.name.ilike(f"%{query}%") | Party.code.ilike(f"%{query}%")
-        ).order_by(Party.name)
-        return list(self.session.scalars(stmt).all())
+

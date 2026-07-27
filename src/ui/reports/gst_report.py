@@ -1,15 +1,19 @@
-import os
-
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel,
-    QAbstractItemView, QFileDialog, QMessageBox, QDateEdit,
-)
-from PySide6.QtCore import Slot, QDate
+from PySide6.QtCore import QDate, Slot
 from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QDateEdit,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.services.report_service import ReportService
-from src.reports.excel_generator import export_table_widget_to_excel
+from src.ui.helpers import make_header, export_dialog
 
 
 class GSTReportWidget(QWidget):
@@ -19,12 +23,7 @@ class GSTReportWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("GST Summary")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("GST Summary"))
 
         toolbar = QHBoxLayout()
         toolbar.addWidget(QLabel("From:"))
@@ -58,14 +57,7 @@ class GSTReportWidget(QWidget):
 
     @Slot()
     def _export(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "gst_summary.xlsx", "Excel (*.xlsx)")
-        if path:
-            try:
-                export_table_widget_to_excel(self.table, path)
-                QMessageBox.information(self, "Exported", f"Saved to {path}")
-                os.startfile(path)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Export failed: {e}")
+        export_dialog(self, self.table, "gst_summary.xlsx")
 
     @Slot()
     def _load(self):

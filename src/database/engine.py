@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from src.utils.constants import DB_FILENAME
 
@@ -18,7 +18,3 @@ def create_db_engine(db_path: str | None = None):
 
 def create_session_factory(engine):
     return sessionmaker(bind=engine)
-
-
-def get_session(session_factory) -> Session:
-    return session_factory()

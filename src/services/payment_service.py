@@ -1,12 +1,12 @@
-from datetime import date
+from datetime import datetime
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.database.models.payment import PaymentTransaction
 from src.database.models.invoice import SalesInvoice
-from src.database.models.purchase import PurchaseBill
 from src.database.models.party import Party
+from src.database.models.payment import PaymentTransaction
+from src.database.models.purchase import PurchaseBill
 
 
 class PaymentService:
@@ -26,7 +26,7 @@ class PaymentService:
         notes: str | None = None,
     ) -> PaymentTransaction:
         if payment_date is None:
-            payment_date = date.today().isoformat()
+            payment_date = datetime.now().date().isoformat()
         txn = PaymentTransaction(
             payment_type=payment_type,
             party_id=party_id,

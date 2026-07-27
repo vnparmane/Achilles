@@ -1,19 +1,34 @@
 
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView,
-    QLabel, QComboBox, QDoubleSpinBox,
-    QMessageBox, QDateEdit, QTextEdit, QFrame, QFormLayout,
-    QGroupBox, QAbstractItemView, QTabWidget, QDialog,
-)
-from PySide6.QtCore import Qt, Slot, QDate
+from PySide6.QtCore import QDate, Qt, Slot
 from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QComboBox,
+    QDateEdit,
+    QDialog,
+    QDoubleSpinBox,
+    QFormLayout,
+    QFrame,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 
-from src.services.party_service import PartyService
-from src.services.item_service import ItemService
-from src.services.godown_service import GodownService
-from src.services.purchase_service import PurchaseService
 from src.services.company_service import CompanyService
+from src.services.godown_service import GodownService
+from src.services.item_service import ItemService
+from src.services.party_service import PartyService
+from src.services.purchase_service import PurchaseService
+from src.ui.helpers import make_header
 from src.utils.gst_utils import calculate_gst
 
 
@@ -41,12 +56,7 @@ class PurchaseBillWidget(QWidget):
         layout = QVBoxLayout(self.form_tab)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("New Purchase Bill")
-        header_font = QFont()
-        header_font.setPointSize(14)
-        header_font.setBold(True)
-        header.setFont(header_font)
-        layout.addWidget(header)
+        layout.addWidget(make_header("New Purchase Bill"))
 
         session = self.session_factory()
         try:
@@ -165,12 +175,7 @@ class PurchaseBillWidget(QWidget):
         self.list_tab = QWidget()
         layout = QVBoxLayout(self.list_tab)
         layout.setContentsMargins(16, 16, 16, 16)
-        header = QLabel("Purchase Bills")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Purchase Bills"))
 
         toolbar = QHBoxLayout()
         self.btn_view = QPushButton("View Details")

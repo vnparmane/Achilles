@@ -1,29 +1,24 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView,
-    QDialog, QFormLayout, QLineEdit, QComboBox,
-    QMessageBox, QLabel, QDoubleSpinBox,
-)
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QDoubleSpinBox,
+    QFormLayout,
+    QHBoxLayout,
+    QHeaderView,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.database.models.party import Party
 from src.services.party_service import PartyService
-
-INDIAN_STATES = [
-    ("", "-- Select --"),
-    ("AP", "Andhra Pradesh"), ("AR", "Arunachal Pradesh"), ("AS", "Assam"),
-    ("BR", "Bihar"), ("CG", "Chhattisgarh"), ("GA", "Goa"),
-    ("GJ", "Gujarat"), ("HR", "Haryana"), ("HP", "Himachal Pradesh"),
-    ("JK", "Jammu and Kashmir"), ("JH", "Jharkhand"), ("KA", "Karnataka"),
-    ("KL", "Kerala"), ("MP", "Madhya Pradesh"), ("MH", "Maharashtra"),
-    ("MN", "Manipur"), ("ML", "Meghalaya"), ("MZ", "Mizoram"),
-    ("NL", "Nagaland"), ("OD", "Odisha"), ("PB", "Punjab"),
-    ("RJ", "Rajasthan"), ("SK", "Sikkim"), ("TN", "Tamil Nadu"),
-    ("TS", "Telangana"), ("TR", "Tripura"), ("UP", "Uttar Pradesh"),
-    ("UK", "Uttarakhand"), ("WB", "West Bengal"),
-    ("DL", "Delhi"),
-]
+from src.ui.helpers import make_header
+from src.utils.constants import INDIAN_STATES
 
 
 class PartyDialog(QDialog):
@@ -137,12 +132,7 @@ class PartyMasterWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Parties (Customers & Vendors)")
-        header_font = QFont()
-        header_font.setPointSize(14)
-        header_font.setBold(True)
-        header.setFont(header_font)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Parties (Customers & Vendors)"))
 
         toolbar = QHBoxLayout()
         self.btn_add = QPushButton("+ New Party")

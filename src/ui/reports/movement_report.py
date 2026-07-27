@@ -1,16 +1,20 @@
-import os
-
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QHeaderView, QLabel,
-    QAbstractItemView, QFileDialog, QMessageBox, QComboBox,
-)
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
-from src.services.report_service import ReportService
 from src.services.item_service import ItemService
-from src.reports.excel_generator import export_table_widget_to_excel
+from src.services.report_service import ReportService
+from src.ui.helpers import make_header, export_dialog
 
 
 class StockMovementReportWidget(QWidget):
@@ -20,12 +24,7 @@ class StockMovementReportWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Stock Movement Report")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Stock Movement Report"))
 
         toolbar = QHBoxLayout()
         toolbar.addWidget(QLabel("Item:"))
@@ -66,14 +65,7 @@ class StockMovementReportWidget(QWidget):
 
     @Slot()
     def _export(self):
-        path, _ = QFileDialog.getSaveFileName(self, "Export Excel", "stock_movement.xlsx", "Excel (*.xlsx)")
-        if path:
-            try:
-                export_table_widget_to_excel(self.table, path)
-                QMessageBox.information(self, "Exported", f"Saved to {path}")
-                os.startfile(path)
-            except Exception as e:
-                QMessageBox.critical(self, "Error", f"Export failed: {e}")
+        export_dialog(self, self.table, "stock_movement.xlsx")
 
     @Slot()
     def _load(self):

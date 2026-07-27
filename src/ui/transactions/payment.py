@@ -1,14 +1,28 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
-    QTableWidget, QTableWidgetItem, QLabel, QComboBox, QDoubleSpinBox,
-    QMessageBox, QDateEdit, QLineEdit, QFormLayout,
-    QAbstractItemView, QTabWidget, QGroupBox, QDialog,
-)
-from PySide6.QtCore import Qt, Slot, QDate
+from PySide6.QtCore import QDate, Qt, Slot
 from PySide6.QtGui import QFont
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QComboBox,
+    QDateEdit,
+    QDialog,
+    QDoubleSpinBox,
+    QFormLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QVBoxLayout,
+    QWidget,
+)
 
 from src.services.party_service import PartyService
 from src.services.payment_service import PaymentService
+from src.ui.helpers import make_header
 from src.utils.constants import PaymentMode
 
 
@@ -33,12 +47,7 @@ class PaymentEntryWidget(QWidget):
         layout = QVBoxLayout(self.form_tab)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Record Payment")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Record Payment"))
 
         form = QFormLayout()
         form.setSpacing(6)
@@ -155,12 +164,7 @@ class PaymentEntryWidget(QWidget):
         self.list_tab = QWidget()
         layout = QVBoxLayout(self.list_tab)
         layout.setContentsMargins(16, 16, 16, 16)
-        header = QLabel("Payment History")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Payment History"))
 
         toolbar = QHBoxLayout()
         self.btn_view = QPushButton("View Details")

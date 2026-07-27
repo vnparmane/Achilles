@@ -1,14 +1,20 @@
+from PySide6.QtCore import QDate, Qt, Slot
 from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QFormLayout, QPushButton,
-    QComboBox, QDoubleSpinBox, QMessageBox, QLabel,
-    QLineEdit, QDateEdit,
+    QComboBox,
+    QDateEdit,
+    QDoubleSpinBox,
+    QFormLayout,
+    QLineEdit,
+    QMessageBox,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
 )
-from PySide6.QtCore import Qt, Slot, QDate
-from PySide6.QtGui import QFont
 
-from src.services.item_service import ItemService
 from src.services.godown_service import GodownService
+from src.services.item_service import ItemService
 from src.services.stock_service import StockService
+from src.ui.helpers import make_header
 
 
 class StockAdjustmentWidget(QWidget):
@@ -19,12 +25,7 @@ class StockAdjustmentWidget(QWidget):
         layout = QVBoxLayout(self)
         layout.setContentsMargins(16, 16, 16, 16)
 
-        header = QLabel("Stock Adjustment")
-        hf = QFont()
-        hf.setPointSize(14)
-        hf.setBold(True)
-        header.setFont(hf)
-        layout.addWidget(header)
+        layout.addWidget(make_header("Stock Adjustment"))
 
         form = QFormLayout()
         form.setSpacing(8)

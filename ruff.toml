@@ -1,0 +1,5 @@
+line-length = 120
+target-version = "py314"
+
+[lint]
+ignore = ["BLE001", "SIM115", "DTZ005"]

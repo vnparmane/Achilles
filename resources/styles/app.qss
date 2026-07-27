@@ -1,15 +1,13 @@
-/* === Global === */
 QMainWindow {
     background: #f5f6fa;
 }
 
 QWidget {
     font-family: "Segoe UI", "Arial", sans-serif;
-    font-size: 12px;
+    font-size: 13px;
     color: #2c3e50;
 }
 
-/* === Sidebar === */
 #sidebar {
     background: #2c3e50;
     border-right: 1px solid #1a252f;
@@ -18,13 +16,14 @@ QWidget {
 #appTitle {
     color: #ecf0f1;
     background: #1a252f;
-    padding: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
 }
 
 #versionLabel {
     color: #7f8c8d;
     font-size: 10px;
-    padding: 2px;
+    padding: 4px;
 }
 
 #sidebarSeparator {
@@ -38,10 +37,11 @@ QWidget {
     color: #bdc3c7;
     border: none;
     outline: none;
+    font-size: 13px;
 }
 
 #navList::item {
-    padding: 8px 4px;
+    padding: 10px 16px;
     border: none;
 }
 
@@ -58,11 +58,10 @@ QWidget {
 #userLabel {
     color: #ecf0f1;
     background: #1a252f;
-    font-size: 11px;
-    padding: 8px;
+    font-size: 12px;
+    padding: 10px 12px;
 }
 
-/* === Content Area === */
 #contentArea {
     background: #f5f6fa;
 }
@@ -72,11 +71,10 @@ QWidget {
     font-size: 16px;
 }
 
-/* === Table Widgets === */
 QTableWidget {
     background: white;
     border: 1px solid #dcdde1;
-    border-radius: 4px;
+    border-radius: 6px;
     gridline-color: #ecf0f1;
     selection-background-color: #3498db;
     selection-color: white;
@@ -84,27 +82,28 @@ QTableWidget {
 }
 
 QTableWidget::item {
-    padding: 4px 8px;
+    padding: 8px 12px;
+    min-height: 28px;
 }
 
 QHeaderView::section {
     background: #2c3e50;
     color: white;
-    padding: 6px 8px;
+    padding: 10px 12px;
     border: none;
     font-weight: bold;
-    font-size: 11px;
+    font-size: 12px;
+    min-height: 32px;
 }
 
-/* === Buttons === */
 QPushButton {
     background: #3498db;
     color: white;
     border: none;
-    border-radius: 4px;
-    padding: 6px 16px;
-    font-size: 12px;
-    min-height: 28px;
+    border-radius: 5px;
+    padding: 8px 18px;
+    font-size: 13px;
+    min-height: 32px;
 }
 
 QPushButton:hover {
@@ -120,13 +119,12 @@ QPushButton:disabled {
     color: #95a5a6;
 }
 
-/* === Input Fields === */
 QLineEdit, QDateEdit, QDoubleSpinBox, QSpinBox, QComboBox, QTextEdit {
     border: 1px solid #dcdde1;
-    border-radius: 4px;
-    padding: 4px 8px;
+    border-radius: 5px;
+    padding: 6px 10px;
     background: white;
-    min-height: 24px;
+    min-height: 28px;
 }
 
 QLineEdit:focus, QDateEdit:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus {
@@ -135,27 +133,26 @@ QLineEdit:focus, QDateEdit:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEd
 
 QComboBox::drop-down {
     border: none;
-    width: 20px;
+    width: 24px;
 }
 
-/* === Group Box === */
 QGroupBox {
     border: 1px solid #dcdde1;
     border-radius: 6px;
-    margin-top: 12px;
-    padding: 12px;
-    padding-top: 20px;
+    margin-top: 14px;
+    padding: 16px;
+    padding-top: 22px;
     font-weight: bold;
+    font-size: 13px;
 }
 
 QGroupBox::title {
     subcontrol-origin: margin;
     subcontrol-position: top left;
-    padding: 2px 8px;
+    padding: 2px 10px;
     color: #2c3e50;
 }
 
-/* === Tabs === */
 QTabWidget::pane {
     border: none;
     background: transparent;
@@ -163,12 +160,13 @@ QTabWidget::pane {
 
 QTabBar::tab {
     background: #ecf0f1;
-    padding: 8px 16px;
+    padding: 10px 20px;
     border: 1px solid #dcdde1;
     border-bottom: none;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     margin-right: 2px;
+    font-size: 13px;
 }
 
 QTabBar::tab:selected {
@@ -180,12 +178,10 @@ QTabBar::tab:hover:!selected {
     background: #dfe6e9;
 }
 
-/* === Labels === */
 QLabel {
     color: #2c3e50;
 }
 
-/* === Scrollbars === */
 QScrollBar:vertical {
     background: #f5f6fa;
     width: 10px;
@@ -206,7 +202,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0;
 }
 
-/* === Wizard === */
 QWizard {
     background: white;
 }
@@ -215,7 +210,6 @@ QWizardPage {
     background: white;
 }
 
-/* === Dialog === */
 QDialog {
     background: #f5f6fa;
 }
