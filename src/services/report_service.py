@@ -174,9 +174,11 @@ class ReportService:
         today = datetime.now().date().isoformat()
         result = {
             "today_sales": 0.0,
+            "today_purchases": 0.0,
             "total_receivables": 0.0,
             "total_payables": 0.0,
             "low_stock_items": [],
+            "recent_activity": [],
         }
 
         today_sales = self.session.execute(
@@ -186,6 +188,14 @@ class ReportService:
             )
         ).scalar()
         result["today_sales"] = round(today_sales or 0.0, 2)
+
+        today_purchases = self.session.execute(
+            select(func.coalesce(func.sum(PurchaseBill.grand_total), 0)).where(
+                PurchaseBill.bill_date == today,
+                PurchaseBill.status == "confirmed",
+            )
+        ).scalar()
+        result["today_purchases"] = round(today_purchases or 0.0, 2)
 
         from src.services.payment_service import PaymentService
         ps = PaymentService(self.session)
@@ -217,6 +227,48 @@ class ReportService:
             {"code": r.code, "name": r.name, "unit": r.unit, "balance": float(r.balance)}
             for r in low_stock
         ]
+
+        recent_invoices = self.session.scalars(
+            select(SalesInvoice).where(SalesInvoice.status == "confirmed")
+            .order_by(SalesInvoice.id.desc()).limit(5)
+        ).all()
+        for inv in recent_invoices:
+            result["recent_activity"].append({
+                "type": "invoice",
+                "label": f"🧾 Invoice {inv.invoice_no}",
+                "party": inv.party.name if inv.party else "",
+                "amount": inv.grand_total,
+                "nav_id": "invoice",
+            })
+
+        recent_bills = self.session.scalars(
+            select(PurchaseBill).where(PurchaseBill.status == "confirmed")
+            .order_by(PurchaseBill.id.desc()).limit(5)
+        ).all()
+        for b in recent_bills:
+            result["recent_activity"].append({
+                "type": "purchase",
+                "label": f"🚚 Purchase {b.bill_no}",
+                "party": b.party.name if b.party else "",
+                "amount": b.grand_total,
+                "nav_id": "purchase",
+            })
+
+        recent_payments = self.session.scalars(
+            select(PaymentTransaction)
+            .order_by(PaymentTransaction.id.desc()).limit(5)
+        ).all()
+        for p in recent_payments:
+            icon = "💰" if p.payment_type == "receipt" else "💳"
+            result["recent_activity"].append({
+                "type": "payment",
+                "label": f"{icon} {p.payment_type.title()}",
+                "party": p.party.name if p.party else "",
+                "amount": p.amount,
+                "nav_id": "payment",
+            })
+
+        result["recent_activity"].sort(key=lambda x: x["label"], reverse=True)
         return result
 
     def sales_register(self, date_from: str | None = None, date_to: str | None = None) -> list[dict]:

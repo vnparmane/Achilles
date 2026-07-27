@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 
 from src.database.models.user import User
 from src.services.user_service import UserService
-from src.ui.helpers import make_header
+from src.ui.helpers import make_header, setup_table_sort
 from src.utils.constants import UserRole
 
 
@@ -145,6 +145,7 @@ class UserMasterWidget(QWidget):
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
+        setup_table_sort(self.table)
         layout.addWidget(self.table)
 
         self.btn_add.clicked.connect(self._add)

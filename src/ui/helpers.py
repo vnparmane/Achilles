@@ -3,8 +3,8 @@ import os
 from PySide6.QtCore import QDate, Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import (
-    QDateEdit, QFileDialog, QHBoxLayout, QLabel, QMessageBox,
-    QPushButton, QVBoxLayout, QWidget,
+    QDateEdit, QFileDialog, QHBoxLayout, QLabel,
+    QMessageBox, QPushButton, QVBoxLayout, QWidget,
 )
 
 from src.reports.excel_generator import export_table_widget_to_excel
@@ -39,6 +39,35 @@ def make_date_range(default_months_back: int = 12):
     date_to.setCalendarPopup(True)
     date_to.setDate(QDate.currentDate())
     return date_from, date_to
+
+
+def form_section(text: str) -> QLabel:
+    lbl = QLabel(text)
+    lbl.setStyleSheet(
+        "font-weight: bold; font-size: 12px; color: #3498db; "
+        "padding: 4px 0; margin-top: 8px; border-bottom: 1px solid #ecf0f1;"
+    )
+    lbl.setMinimumHeight(28)
+    return lbl
+
+
+def setup_table_sort(table):
+    table.setSortingEnabled(True)
+
+
+def make_table_filter(table, search_input):
+    def on_filter(text):
+        q = text.lower()
+        for row in range(table.rowCount()):
+            visible = False
+            for col in range(table.columnCount()):
+                item = table.item(row, col)
+                if item and q in item.text().lower():
+                    visible = True
+                    break
+            table.setRowHidden(row, not visible)
+
+    search_input.textChanged.connect(on_filter)
 
 
 STATUS_COLORS = {

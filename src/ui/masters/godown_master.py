@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 
 from src.database.models.godown import Godown
 from src.services.godown_service import GodownService
-from src.ui.helpers import make_header
+from src.ui.helpers import make_header, setup_table_sort
 
 
 class GodownDialog(QDialog):
@@ -107,6 +107,7 @@ class GodownMasterWidget(QWidget):
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
+        setup_table_sort(self.table)
         layout.addWidget(self.table)
 
         self.btn_add.clicked.connect(self._add)

@@ -1,3 +1,4 @@
+from PySide6.QtGui import QAction, QKeySequence
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QMainWindow,
@@ -6,7 +7,9 @@ from PySide6.QtWidgets import (
 )
 
 from src.database.models.user import User
+from src.ui.search_dialog import SearchDialog
 from src.ui.sidebar import SidebarWidget
+from src.ui.toast import ToastManager
 from src.utils.constants import APP_NAME, APP_VERSION
 
 
@@ -17,6 +20,8 @@ class MainWindow(QMainWindow):
         self.current_user = current_user
         self.setWindowTitle(f"{APP_NAME} v{APP_VERSION}")
         self.resize(1200, 800)
+
+        ToastManager.instance().install(self)
 
         central = QWidget()
         self.setCentralWidget(central)
@@ -39,6 +44,32 @@ class MainWindow(QMainWindow):
         self.content_stack.setCurrentWidget(self.dashboard)
 
         self.sidebar.navigation_changed.connect(self._on_navigate)
+
+        search_action = QAction("Search", self)
+        search_action.setShortcut(QKeySequence("Ctrl+K"))
+        search_action.triggered.connect(self._open_search)
+        self.addAction(search_action)
+
+        new_invoice = QAction("New Invoice", self)
+        new_invoice.setShortcut(QKeySequence("Ctrl+N"))
+        new_invoice.triggered.connect(lambda: self._on_navigate("invoice"))
+        self.addAction(new_invoice)
+
+        save_action = QAction("Save", self)
+        save_action.setShortcut(QKeySequence("Ctrl+S"))
+        save_action.triggered.connect(self._trigger_save)
+        self.addAction(save_action)
+
+    def _open_search(self):
+        dlg = SearchDialog(self.session_factory, self)
+        dlg.exec()
+
+    def _trigger_save(self):
+        widget = self.content_stack.currentWidget()
+        if hasattr(widget, "btn_save") and widget.btn_save.isVisible():
+            widget.btn_save.click()
+        elif hasattr(widget, "_save"):
+            widget._save()
 
     def _on_navigate(self, nav_id: str):
         for i in range(self.content_stack.count()):

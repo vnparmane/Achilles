@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 
 from src.database.models.item import Item
 from src.services.item_service import ItemService
-from src.ui.helpers import make_header
+from src.ui.helpers import form_section, make_header, make_table_filter, setup_table_sort
 from src.utils.constants import GST_RATES, ItemUnit
 
 
@@ -30,27 +30,34 @@ class ItemDialog(QDialog):
         self.setMinimumWidth(400)
         self.setModal(True)
 
-        layout = QFormLayout(self)
-        layout.setSpacing(8)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(6)
 
+        layout.addWidget(form_section("Basic Info"))
+        basic = QFormLayout()
+        basic.setSpacing(6)
         self.name_edit = QLineEdit()
         self.name_edit.setPlaceholderText("Item name *")
         if item:
             self.name_edit.setText(item.name)
-        layout.addRow("Name *:", self.name_edit)
+        basic.addRow("Name *:", self.name_edit)
 
         self.unit_combo = QComboBox()
         for u in ItemUnit:
             self.unit_combo.addItem(u.value)
         if item:
             self.unit_combo.setCurrentText(item.unit)
-        layout.addRow("Unit:", self.unit_combo)
+        basic.addRow("Unit:", self.unit_combo)
+        layout.addLayout(basic)
 
+        layout.addWidget(form_section("Tax & Inventory"))
+        tax = QFormLayout()
+        tax.setSpacing(6)
         self.hsn_edit = QLineEdit()
         self.hsn_edit.setPlaceholderText("HSN code (e.g., 5205)")
         if item and item.hsn_code:
             self.hsn_edit.setText(item.hsn_code)
-        layout.addRow("HSN Code:", self.hsn_edit)
+        tax.addRow("HSN Code:", self.hsn_edit)
 
         self.gst_combo = QComboBox()
         for rate in GST_RATES:
@@ -59,14 +66,15 @@ class ItemDialog(QDialog):
             idx = self.gst_combo.findData(item.gst_rate)
             if idx >= 0:
                 self.gst_combo.setCurrentIndex(idx)
-        layout.addRow("GST Rate:", self.gst_combo)
+        tax.addRow("GST Rate:", self.gst_combo)
 
         self.balance_spin = QDoubleSpinBox()
         self.balance_spin.setRange(0, 999999)
         self.balance_spin.setDecimals(2)
         if item:
             self.balance_spin.setValue(item.opening_balance)
-        layout.addRow("Opening:", self.balance_spin)
+        tax.addRow("Opening:", self.balance_spin)
+        layout.addLayout(tax)
 
         btn_layout = QHBoxLayout()
         save_btn = QPushButton("Save")
@@ -74,7 +82,7 @@ class ItemDialog(QDialog):
         btn_layout.addStretch()
         btn_layout.addWidget(save_btn)
         btn_layout.addWidget(cancel_btn)
-        layout.addRow(btn_layout)
+        layout.addLayout(btn_layout)
 
         save_btn.clicked.connect(self._save)
         cancel_btn.clicked.connect(self.reject)
@@ -117,6 +125,11 @@ class ItemMasterWidget(QWidget):
         toolbar.addWidget(self.btn_edit)
         toolbar.addWidget(self.btn_delete)
         toolbar.addStretch()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("🔍  Search items...")
+        self.search_input.setClearButtonEnabled(True)
+        self.search_input.setFixedWidth(250)
+        toolbar.addWidget(self.search_input)
         toolbar.addWidget(self.btn_refresh)
         layout.addLayout(toolbar)
 
@@ -131,6 +144,8 @@ class ItemMasterWidget(QWidget):
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
+        setup_table_sort(self.table)
+        make_table_filter(self.table, self.search_input)
         layout.addWidget(self.table)
 
         self.btn_add.clicked.connect(self._add)

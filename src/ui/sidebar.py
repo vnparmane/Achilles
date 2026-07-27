@@ -12,29 +12,48 @@ from PySide6.QtWidgets import (
 from src.database.models.user import User
 from src.utils.constants import APP_NAME, APP_VERSION, UserRole
 
+NAV_ICONS = {
+    "dashboard": "🏠",
+    "party": "👥",
+    "item": "📦",
+    "godown": "🏪",
+    "company": "⚙️",
+    "purchase": "🚚",
+    "invoice": "🧾",
+    "payment": "💰",
+    "stock_adjustment": "📊",
+    "stock_report": "📈",
+    "stock_movement": "🔄",
+    "ledger": "📒",
+    "gst_report": "🧮",
+    "purchase_register": "📋",
+    "sales_register": "📋",
+    "users": "👤",
+}
+
 NAV_ITEMS = [
     ("MASTERS", None, None),
-    ("Party", "party", None),
-    ("Item", "item", None),
-    ("Godown", "godown", None),
-    ("Company", "company", None),
+    ("📦 Inventory", "item", None),
+    ("👥 Parties", "party", None),
+    ("🏪 Godowns", "godown", None),
+    ("⚙️ Company", "company", None),
     ("", None, None),
     ("TRANSACTIONS", None, None),
-    ("Purchase Bill", "purchase", None),
-    ("Sales Invoice", "invoice", None),
-    ("Payment", "payment", None),
-    ("Stock Adjustment", "stock_adjustment", None),
+    ("🚚 Purchases", "purchase", None),
+    ("🧾 Sales", "invoice", None),
+    ("💰 Payments", "payment", None),
+    ("📊 Stock Adj.", "stock_adjustment", None),
     ("", None, None),
     ("REPORTS", None, None),
-    ("Stock Report", "stock_report", None),
-    ("Stock Movement", "stock_movement", None),
-    ("Party Ledger", "ledger", None),
-    ("GST Report", "gst_report", None),
-    ("Purchase Register", "purchase_register", None),
-    ("Sales Register", "sales_register", None),
+    ("📈 Stock", "stock_report", None),
+    ("🔄 Movement", "stock_movement", None),
+    ("📒 Ledger", "ledger", None),
+    ("🧮 GST", "gst_report", None),
+    ("📋 Purchase Reg.", "purchase_register", None),
+    ("📋 Sales Reg.", "sales_register", None),
     ("", None, None),
     ("ADMIN", None, None),
-    ("Users", "users", UserRole.ADMIN),
+    ("👤 Users", "users", UserRole.ADMIN),
 ]
 
 
@@ -108,7 +127,8 @@ class SidebarWidget(QWidget):
                     font.setBold(True)
                     item.setFont(font)
             else:
-                item.setText(f"    {text}")
+                icon = NAV_ICONS.get(nav_id, "")
+                item.setText(f"{icon}  {text}" if icon else f"   {text}")
                 item.setData(Qt.ItemDataRole.UserRole, nav_id)
             self.list_widget.addItem(item)
 

@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 
 from src.database.models.party import Party
 from src.services.party_service import PartyService
-from src.ui.helpers import make_header
+from src.ui.helpers import form_section, make_header, make_table_filter, setup_table_sort
 from src.utils.constants import INDIAN_STATES
 
 
@@ -30,33 +30,40 @@ class PartyDialog(QDialog):
         self.setMinimumWidth(450)
         self.setModal(True)
 
-        layout = QFormLayout(self)
-        layout.setSpacing(8)
+        layout = QVBoxLayout(self)
+        layout.setSpacing(6)
 
+        layout.addWidget(form_section("Basic Info"))
+        basic = QFormLayout()
+        basic.setSpacing(6)
         self.name_edit = QLineEdit()
         self.name_edit.setPlaceholderText("Party name *")
         if party:
             self.name_edit.setText(party.name)
-        layout.addRow("Name *:", self.name_edit)
+        basic.addRow("Name *:", self.name_edit)
 
         self.type_combo = QComboBox()
         self.type_combo.addItems(["customer", "vendor", "both"])
         if party:
             self.type_combo.setCurrentText(party.party_type)
-        layout.addRow("Type:", self.type_combo)
+        basic.addRow("Type:", self.type_combo)
+        layout.addLayout(basic)
 
+        layout.addWidget(form_section("Tax Details"))
+        tax = QFormLayout()
+        tax.setSpacing(6)
         self.gstin_edit = QLineEdit()
         self.gstin_edit.setPlaceholderText("GSTIN (15 characters)")
         self.gstin_edit.setMaxLength(15)
         if party and party.gstin:
             self.gstin_edit.setText(party.gstin)
-        layout.addRow("GSTIN:", self.gstin_edit)
+        tax.addRow("GSTIN:", self.gstin_edit)
 
         self.reg_combo = QComboBox()
         self.reg_combo.addItems(["regular", "composition", "unregistered"])
         if party:
             self.reg_combo.setCurrentText(party.registration_type)
-        layout.addRow("Registration:", self.reg_combo)
+        tax.addRow("Registration:", self.reg_combo)
 
         self.state_combo = QComboBox()
         for code, name in INDIAN_STATES:
@@ -65,30 +72,39 @@ class PartyDialog(QDialog):
             idx = self.state_combo.findText(party.state)
             if idx >= 0:
                 self.state_combo.setCurrentIndex(idx)
-        layout.addRow("State:", self.state_combo)
+        tax.addRow("State:", self.state_combo)
+        layout.addLayout(tax)
 
+        layout.addWidget(form_section("Contact"))
+        contact = QFormLayout()
+        contact.setSpacing(6)
         self.address_edit = QLineEdit()
         self.address_edit.setPlaceholderText("Address")
         if party and party.address:
             self.address_edit.setText(party.address)
-        layout.addRow("Address:", self.address_edit)
+        contact.addRow("Address:", self.address_edit)
 
         self.phone_edit = QLineEdit()
         if party and party.phone:
             self.phone_edit.setText(party.phone)
-        layout.addRow("Phone:", self.phone_edit)
+        contact.addRow("Phone:", self.phone_edit)
 
         self.email_edit = QLineEdit()
         if party and party.email:
             self.email_edit.setText(party.email)
-        layout.addRow("Email:", self.email_edit)
+        contact.addRow("Email:", self.email_edit)
+        layout.addLayout(contact)
 
+        layout.addWidget(form_section("Financial"))
+        fin = QFormLayout()
+        fin.setSpacing(6)
         self.balance_spin = QDoubleSpinBox()
         self.balance_spin.setRange(-999999, 999999)
         self.balance_spin.setDecimals(2)
         if party:
             self.balance_spin.setValue(party.opening_balance)
-        layout.addRow("Opening Bal:", self.balance_spin)
+        fin.addRow("Opening Bal:", self.balance_spin)
+        layout.addLayout(fin)
 
         btn_layout = QHBoxLayout()
         save_btn = QPushButton("Save")
@@ -96,7 +112,7 @@ class PartyDialog(QDialog):
         btn_layout.addStretch()
         btn_layout.addWidget(save_btn)
         btn_layout.addWidget(cancel_btn)
-        layout.addRow(btn_layout)
+        layout.addLayout(btn_layout)
 
         save_btn.clicked.connect(self._save)
         cancel_btn.clicked.connect(self.reject)
@@ -144,6 +160,11 @@ class PartyMasterWidget(QWidget):
         toolbar.addWidget(self.btn_edit)
         toolbar.addWidget(self.btn_delete)
         toolbar.addStretch()
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("🔍  Search parties...")
+        self.search_input.setClearButtonEnabled(True)
+        self.search_input.setFixedWidth(250)
+        toolbar.addWidget(self.search_input)
         toolbar.addWidget(self.btn_refresh)
         layout.addLayout(toolbar)
 
@@ -158,6 +179,8 @@ class PartyMasterWidget(QWidget):
         self.table.setSelectionMode(QTableWidget.SelectionMode.SingleSelection)
         self.table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
         self.table.setAlternatingRowColors(True)
+        setup_table_sort(self.table)
+        make_table_filter(self.table, self.search_input)
         layout.addWidget(self.table)
 
         self.btn_add.clicked.connect(self._add)
