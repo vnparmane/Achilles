@@ -1,4 +1,4 @@
-from PySide6.QtCharts import QChart, QChartView, QBarCategoryAxis, QBarSeries, QBarSet, QValueAxis
+from PySide6.QtCharts import QBarCategoryAxis, QBarSeries, QBarSet, QChart, QChartView, QValueAxis
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPainter
 

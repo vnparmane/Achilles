@@ -125,7 +125,7 @@ class SearchDialog(QDialog):
             self.results_list.addItem(item)
 
     def _on_select(self, item):
-        entry_type, eid = item.data(Qt.ItemDataRole.UserRole)
+        entry_type, _ = item.data(Qt.ItemDataRole.UserRole)
         nav_map = {"party": "party", "item": "item", "godown": "godown"}
         nav_id = nav_map.get(entry_type, entry_type)
         self.accept()
